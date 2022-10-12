@@ -265,7 +265,7 @@ In the testing block, we will see the rationale behind testing for weight differ
 
 Now, we are going to look at the `palmerpenguins` data. These are measurements of on three different penguin species on islands near the antarctic Palmer Station.
 
-![Penguins](penguins.png)
+![Penguins](img/penguins.png)
 
 
 ```{r}
