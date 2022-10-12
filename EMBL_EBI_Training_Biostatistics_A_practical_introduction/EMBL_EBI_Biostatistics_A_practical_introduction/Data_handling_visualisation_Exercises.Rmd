@@ -1,0 +1,119 @@
+---
+title: "PlantGrowth - Data handling and visualisation"
+output: html_notebook
+date: '2022-10-12'
+---
+
+## Load PlantGrowth dataset
+
+```{r}
+data("PlantGrowth")
+data("ToothGrowth")
+```
+
+
+## Explore the data frame
+
+Use the functions you learned above to print out the column names of the PlantGrowth data set. Then print out the column with the weights.
+
+```{r}
+dim(PlantGrowth)
+names(PlantGrowth)
+head(PlantGrowth, 5)
+```
+
+## Manipulating data frames
+
+* Filter the PlantGrowth data for experiments from the control group.
+* Additionally select for weight.
+
+```{r}
+t <- PlantGrowth %>%
+  filter(group=="ctrl") %>% 
+  select("weight")
+head(t, 3) # Showing only first three lines
+```
+
+## Plotting with ggplot2
+
+Complete the code below to plot the plant weights against the groups.
+
+```{r eval=FALSE}
+PlantGrowth %>% 
+  ggplot(   ) +
+```
+
+```{r}
+PlantGrowth %>% 
+  ggplot( mapping = aes(x = group, y = weight) ) +
+  geom_point()
+```
+
+## Plotting categorical data
+
+Plot the plant weights against the groups using a boxplot.
+
+```{r}
+PlantGrowth %>% 
+  ggplot( mapping = aes(x = group, y = weight) ) +
+  geom_boxplot()
+```
+
+## More than two variables
+
+The `ToothGrowth` data set has three variables: A supplement, a dose, and the resulting tooth length.
+
+```{r}
+head(ToothGrowth, 3)
+```
+
+Complete the code below to plot the tooth length against dosage, while faceting by supplement.
+
+```{r eval=FALSE}
+ToothGrowth %>% 
+  ggplot(aes(x=   , y=    ))+
+  geom_point()+
+  facet_wrap()
+```
+
+```{r eval=FALSE}
+ToothGrowth %>% 
+  ggplot(aes(x=dose, y=len))+
+  geom_point()+
+  facet_wrap(vars(supp))
+```
+
+## Continuous variables
+
+Combine filtering and plotting: Filter for Adelie penguins first, then plot body mass against flipper length in a scatter plot.
+
+```{r eval=FALSE}
+library(palmerpenguins)
+penguins %>% 
+  filter(  ) %>% 
+  ggplot(  ) +
+```
+
+```{r}
+library(palmerpenguins)
+head(penguins)
+```
+
+```{r}
+penguins %>%
+  drop_na() %>%
+  filter( species == "Adelie" ) %>%
+  ggplot( aes(x=body_mass_g, y=flipper_length_mm)) +
+  geom_point()
+```
+
+
+
+
+
+
+
+
+
+
+

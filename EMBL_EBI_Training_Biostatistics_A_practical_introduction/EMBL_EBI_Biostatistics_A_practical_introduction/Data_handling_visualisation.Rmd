@@ -1,0 +1,405 @@
+---
+title: "Mice Pheno - Data handling and visualisation"
+author: "Alisson G. Chiquitto <chiquitto@gmail.com>"
+date: '2022-10-12'
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+By the end of this first interactive tutorial you will be able to:
+
+-   explore and manipulate data frames in R
+-   use the R package ggplot2 to visualise data
+
+## Resources
+
+This lecture is based on the EMBL Bio-IT course ["Introduction to R"](https://grp-bio-it-workshops.embl-community.io/introduction-to-R/index.html), which in turn is based on [Data Carpentry](https://datacarpentry.org/) materials. The mouse data are from Winzell and Ahrén (2004) <https://diabetes.diabetesjournals.org/content/53/suppl_3/S215>.
+
+## Setup
+
+This first tutorial is an introduction to data handling, exploration and plotting in R. Before we can think about useful statistical analysis of our data, we first have to get an overview how they look like. And for many scientific questions, the answer will already be apparent when looking at the right plots.
+
+We start by loading the required packages. `ggplot2` is included in the tidyverse package.
+
+```{r, results='asis'}
+library(tidyverse)
+library(Hmisc)
+```
+
+## Load mice_pheno dataset
+We load the `mice_pheno` data into R:
+
+```{r}
+# mice_pheno <- read.csv2(file= url("https://raw.githubusercontent.com/genomicsclass/dagdata/master/inst/extdata/mice_pheno.csv"), sep=",")
+mice_pheno <- read.csv2(file="dataset/mice_pheno.csv", sep=",")
+mice_pheno$Bodyweight <- as.numeric(mice_pheno$Bodyweight)
+```
+
+We can see this when inspecting the structure of a data frame with the function `str()`:
+
+```{r}
+str(mice_pheno)
+```
+
+## Explore the data frame
+Size:
+
+* `dim(mice_pheno)` - returns a vector with the number of rows in the first element, and the number of columns as the second element (the dimensions of the object)
+
+Content:
+
+* `head(mice_pheno)` - shows the first 6 rows
+
+Names:
+
+* `names(mice_pheno)` - returns the column names (synonym of colnames() for data.frame objects)
+* `rownames(mice_pheno)` - returns the row names
+
+Data frames can be subset by calling indices (as shown previously), but also by calling their column names directly:
+
+```{r results='hide'}
+mice_pheno[, 3]     # Result is a vector OR
+mice_pheno$Bodyweight          # Result is a vector
+```
+
+## Factors
+
+Factors represent categorical data. Once created, factors can only contain a pre-defined set of values, known as levels. By default, R always sorts levels in alphabetical order. For instance, if you have a factor with 2 levels:
+
+```{r}
+sex <- factor(c("male", "female", "female", "male"))
+sex
+```
+
+## Manipulating data frames
+
+There are a few basic functions for handling data frames. Also have a look at the (cheat sheet for data transformation)[https://raw.githubusercontent.com/rstudio/cheatsheets/master/data-transformation.pdf].
+
+### The pipe operator
+
+Fo the following operations, we use the pipe operator, denoted by `%>%`, to pass a data frame to a function. The object on the left of the pipe operator will be the first argument for the function on the right of the pipe operator. As you will see below, a series of pipe operations can be used to encode a series of data manipulations.
+
+### Filter
+
+Extract observations (i.e. rows) that fulfill certain criteria. We use logical operators to specify the criteria:
+
+```{r}
+mice_pheno %>%
+  filter(Sex == "F" & Diet == "hf" & Bodyweight < 18)
+```
+
+### Select
+
+Select one or more columns of interest. This operation can be preceded (or followed) by filtering.
+
+```{r}
+mice_pheno %>%  
+  filter(Sex == "F" & Diet == "hf" & Bodyweight < 18) %>% 
+  select(Bodyweight, Diet)
+```
+
+### Grouped summaries: group_by and summarize
+
+We can divide the data in a data frame into groups. Then, the following analysis (often a summarizing function) will be applied on each group separately.
+
+For example, we could want to find out the mean weight of mice.
+
+```{r}
+mean(mice_pheno$Bodyweight, na.rm=TRUE)
+```
+
+### But actually, we are interested in the difference in means between the two diets. So we group the data into the two diet groups, before applying the mean:
+
+```{r}
+mice_pheno %>% 
+  group_by(Diet) %>% 
+  summarize(group_mean = mean(Bodyweight, na.rm=TRUE))
+```
+
+We can also further group by sex:
+
+```{r warning=FALSE}
+mice_pheno %>% 
+  group_by(Diet, Sex) %>% 
+  summarize(group_mean = mean(Bodyweight,na.rm=TRUE), group_sd=sd(Bodyweight,na.rm=TRUE), groups="rowwise")
+```
+
+## Plotting with ggplot2
+
+Have a look at the (cheat sheet for data visualization!)[https://raw.githubusercontent.com/rstudio/cheatsheets/master/data-visualization-2.1.pdf]
+
+To build a ggplot, we will use the following basic template that can be used for different types of plots:
+
+```
+ggplot(data = <DATA>, mapping = aes(<MAPPINGS>)) +  <GEOM_FUNCTION>()
+```
+
+Use the `ggplot()` function and bind the plot to a specific data frame using the data argument
+
+```{r eval=FALSE, results='hide'}
+ggplot(data = mice_pheno)
+```
+
+Define a mapping (using the aesthetic (aes) function), by selecting the variables to be plotted and specifying how to present them in the graph, e.g. as x/y positions or characteristics such as size, shape, color, etc.
+
+```{r eval=FALSE, results='hide'}
+ggplot(data = mice_pheno, mapping = aes(x = Diet, y = Bodyweight))
+```
+
+Add ‘geoms’ – graphical representations of the data in the plot (points, lines, bars). ggplot2 offers many different geoms; we will use some common ones today, including:
+
+* `geom_point()` for scatter plots, dot plots, etc.
+* `geom_boxplot()` for, well, boxplots!
+
+To add a geom to the plot use the `+` operator. Because we have two continuous variables, let’s use `geom_point()` first:
+
+```{r warning=FALSE}
+weights_plot <- ggplot(data = mice_pheno, mapping = aes(x = Diet, y = Bodyweight))
+weights_plot + geom_point()
+```
+
+
+```{r eval=FALSE, echo=FALSE}
+## To see NA values:
+mice_pheno[ is.na(mice_pheno$Bodyweight), ]
+```
+
+The `+` in the `ggplot2` package is particularly useful because it allows you to modify existing `ggplot` objects.
+
+*Notes**
+
+* Anything you put in the `ggplot()` function can be seen by any geom layers that you add (i.e., these are universal plot settings). This includes the x- and y-axis mapping you set up in `aes()`;
+* You can also specify mappings for a given geom independently of the mappings defined globally in the `ggplot()` function;
+* The `+` sign used to add new layers must be placed at the end of the line containing the previous layer. If, instead, the `+` sign is added at the beginning of the line containing the new layer, `ggplot2` will not add the new layer and will return an error message.
+
+```{r eval=FALSE}
+# This is the correct syntax for adding layers
+weights_plot +
+  geom_point()
+
+# This will not add the new layer and will return an error message
+weights_plot
+  + geom_point()
+```
+
+## Plotting categorical data
+
+Categories are encoded as factors or character. In our mice data, the diet and sex variable are categorical variables. In our plots, we want to compare the categories of these variables to each other, for example we want to compare the `chow` and `hf` diets to each other, with respect to the resulting mouse weight.
+
+### Boxplot
+
+A boxplot summarizes a few statistics on the data: The median, first and third quartile and outliers.
+
+```{r warning=FALSE}
+weights_plot +
+  geom_boxplot()
+```
+
+But even though this summary can be useful, some information on this original data points is lost. Therefore, it’s useful to overlay the data points on the boxes:
+
+```{r warning=FALSE}
+weights_plot +
+  geom_boxplot() +
+  geom_jitter(width=.3, alpha=0.2)
+```
+
+Because there are quite a few data points, I use transparency and jitter to avoid overplotting.
+
+### Violin plot
+
+The violin plot is a nice tool to show the distributions in several categories in the same plot.
+
+```{r warning=FALSE}
+weights_plot +
+  geom_violin(aes(fill=Diet))
+```
+
+## More than two variables
+
+If we look at the `mice_pheno` data set, we notice that we so far ignored one variable:
+
+```{r}
+str(mice_pheno)
+```
+
+We have several options:
+
+* Keep ignoring the sex variable;
+* Subset the data frame for plotting;
+* encode the Sex variable in the plot using tools like color or faceting.
+
+### Combine filtering and plotting
+
+We are comparing the two diets only for female mice:
+
+```{r}
+mice_pheno %>% 
+  filter(Sex=="F") %>% 
+  ggplot(aes(x=Diet, y = Bodyweight)) +
+  geom_violin(aes(fill=Diet))
+```
+
+### Faceting
+
+Use the faceting option in `ggplot2` to create one sub-plot for each sex:
+
+```{r}
+weights_plot +
+  geom_violin(aes(fill=Diet))+
+  facet_wrap(vars(Sex))
+```
+
+### Encode a variable by color
+
+```{r}
+weights_plot +
+  geom_jitter(width=0.4,aes(colour=Sex), alpha=0.5)
+```
+
+To get a feeling for the data, it’s always recommended to look at individual points at least once. It’s also a matter of taste which graphics you find more enlightening. I personally find this plot useful, but also a bit messy, so I’d probably prefer faceting and violins.
+
+In the testing block, we will see the rationale behind testing for weight differences between the two diets, or male and female mice.
+
+## Continuous variables
+
+Now, we are going to look at the `palmerpenguins` data. These are measurements of on three different penguin species on islands near the antarctic Palmer Station.
+
+![Penguins](penguins.png)
+
+
+```{r}
+# install.packages("palmerpenguins")
+library(palmerpenguins)
+names(penguins)
+```
+
+We can start exploring this data set by looking at the dimensions:
+
+```{r}
+dim(penguins)
+```
+
+Visualize individual relationships in a scatter plot, for example bill length and flipper length:
+
+```{r}
+ggplot(penguins, aes(x=bill_length_mm, y=flipper_length_mm)) +
+  geom_point() +
+  geom_rug()
+```
+
+We see a few patterns here, so maybe it is useful to point out a few other variables How about species or sex?
+
+```{r}
+penguins %>% 
+  filter(!is.na(sex)) %>% 
+  ggplot(aes(x=bill_length_mm, y=flipper_length_mm, colour=species, shape=sex)) +
+  geom_point()
+```
+
+We can subset to female Gentoo and look at individual relationships:
+
+```{r}
+penguins %>% 
+  filter(sex=="female", species =="Gentoo") %>% 
+  ggplot( aes(x=bill_length_mm, y=bill_depth_mm)) +
+  geom_point()
+```
+
+Now it’s easy to get lost in the details and individual plots and associations. Therefore, it’s always good to get an overview first. One convenient tool for that is the `GGally::ggpairs` function. Let’s suppose we are interested in the Gentoo, so we filter for them:
+
+```{r}
+# install.packages("GGally")
+library(GGally)
+```
+
+```{r}
+penguins %>% 
+  filter( species =="Gentoo" ) %>% 
+  select(bill_length_mm,  body_mass_g, flipper_length_mm) %>% describe()
+```
+
+```{r}
+penguins %>% 
+  filter( species =="Gentoo" ) %>% 
+  select(bill_length_mm,  body_mass_g, flipper_length_mm) %>% 
+  ggpairs()
+```
+
+This plot quickly tells us that bill length, flipper length and body mass are all positively correlated with each other. One way to interpret this is that they all somehow represent (or grow with) the size of the penguin.
+
+We can use this interpretation to reduce the dimensionality of the data set for further analyses.
+
+## Overplotting
+
+This is a modified example from chapter 7 in the online book (R4ds)[https://r4ds.had.co.nz/exploratory-data-analysis.html] by Hadley Wickham and Garrett Grolemund.
+
+We look at a data sets on diamonds. Data was collected on more than 50,000 diamonds’ price, carat, size, and some quality criteria. We will focus on the relation between carat and price, and we’ll also try to learn something about the distribution of the data.
+
+```{r}
+str(diamonds)
+```
+
+We’ll cut off the carat at 2.5, because above that value, the data are sparse.
+
+```{r}
+diamonds2 <- diamonds %>%
+  filter(carat <= 2.5) %>%
+  mutate(lprice = log2(price), lcarat = log2(carat))
+```
+
+A good starting point for looking at the covariation of two variables is often a scatter plot:
+
+```{r}
+ggplot(diamonds2, aes(x=carat, y=price))+
+  geom_point()
+```
+
+But we have a problem here: There are >50,000 data points, and they overlap heavily. From this plot, we can’t see where most of the data points lie. Anywhere in the black regions could be a huge, dense cloud of data points and anything else we see are just "outliers". One thing to see more clearly is to make the points transparent:
+
+```{r}
+ggplot(data = diamonds) + 
+  geom_point(mapping = aes(x = carat, y = price), alpha = 1 / 100)
+```
+
+You notice that the a lot of points are cramped towards the origin. You could try the log-scale:
+
+```{r}
+ggplot(data = diamonds2) + 
+  geom_point(mapping = aes(x = carat, y = price), alpha = 1 / 100) +
+  scale_y_log10() +
+  scale_x_log10()
+```
+
+Or bin them - this is kind of a 2D histogram, where the counts are represented as colors:
+
+```{r}
+# install.packages("hexbin")
+library(hexbin)
+ggplot(data = diamonds2) +
+  geom_hex(mapping = aes(x = carat, y = price))
+```
+
+By looking at the data in these different ways, we have gotten the idea, that a lot of the diamonds have below 1 carat, and the relation between carat and price looks linear on the log-log-scale, which could be useful for modeling it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
