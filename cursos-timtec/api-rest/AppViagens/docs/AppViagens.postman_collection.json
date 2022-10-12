@@ -1,0 +1,264 @@
+{
+	"info": {
+		"_postman_id": "efab02ab-17e9-4f01-99a3-7d26c94708ba",
+		"name": "AppViagens",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Hotel",
+			"item": [
+				{
+					"name": "Salvar Hotel 1",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"nome\":\"MFG\", \"endereco\":\"Av Umuarama 4632\", \"cidade\": \"Umuarama\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/hoteis",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"hoteis"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Salvar Hotel 2",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "c6863862-a643-4eac-b225-fc1c9fc135ac",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"nome\":\"Caiua\", \"endereco\":\"Av Brasil 12345\", \"cidade\": \"Guaira\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/hoteis",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"hoteis"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Hoteis",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/hoteis",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"hoteis"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pesquisar",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/hoteis/search?cidade=Umuarama",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"hoteis",
+								"search"
+							],
+							"query": [
+								{
+									"key": "cidade",
+									"value": "Umuarama"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pesquisar por cidade",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/hoteis/search/findByCidade?cidade=Umuarama",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"hoteis",
+								"search",
+								"findByCidade"
+							],
+							"query": [
+								{
+									"key": "cidade",
+									"value": "Umuarama"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pesquisar por cidade 2",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Api-Version",
+								"value": "2.0",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/services/hoteis?cidade=Umuarama",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"services",
+								"hoteis"
+							],
+							"query": [
+								{
+									"key": "cidade",
+									"value": "Umuarama"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Principal",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Profile",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/profile",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DisponibilidadeData",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/disponibilidade/2020-09-19",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"disponibilidade",
+						"2020-09-19"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Quarto 1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/services/quartos/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"services",
+						"quartos",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
