@@ -1,0 +1,169 @@
+---
+title: "Probability distributions"
+output: html_notebook
+date: '2022-10-12'
+---
+
+```{r results='hide'}
+library(tidyverse)
+```
+
+By the end of this second interactive tutorial you will be able to:
+
+-   describe what sampling and probability distributions are
+-   list some common distributions of biological data
+-   visualize the distribution of your data in R
+-   pick a suitable distribution to model your data with
+
+Before starting this tutorial, we recommend you complete the first tutorial on data handling and visualization or have basic knowledge or R and the tidyverse.
+
+## The binomial distribution
+
+Before we look at more distributions, let's get some hands-on experience in R! R knows a whole range of distributions: (Here)[<https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Distributions.html>] is a list of them.
+
+For each distribution, R has four different function calls: For the binomial distribution, these all end with `binom`: * `dbinom`: density * `pbinom`: cumulative distribution function (percentage of values smaller than) * `qbinom`: quantile function (inverse of cumulative distribution) * `rbinom`: generates random numbers
+
+The first letter specifies if we want to look at the density, probability distribution/mass function, quantile or random numbers. The suffix specifies the distribution.
+
+The arguments depend on the distribution we are looking at, but always include the parameters of that function.
+
+**Calculating probabilities:** Let's use the example where we caught 10 frogs and count how many of them are light-colored.
+
+For known parameters, we can calculate the the chances of counting exactly 5 light-colored frogs:
+
+```{r}
+n = 10 # number of frogs we catch
+p = 0.3 # true fraction of light frogs
+dbinom(x=5, size=n, prob=p)
+```
+
+We can ask for the probability of catching at most (or at least) 5 light frogs. In this case, we need the cumulative probability distribution starting with `p`:
+
+```{r}
+pbinom(q=5, size=n, prob=p) # at most
+```
+
+```{r}
+pbinom(q=5, size=n,prob=p, lower.tail=FALSE) # larger than
+```
+
+Catching at least 5 light frogs is a rare event.
+
+**Exercise:** There is a disease with a known prevalence of 4%. You have a group of 100 randomly selected persons. Use the above functions to calculate the probability of seeing exactly 7 persons with the disease.
+
+```{r}
+n = 100 # number of frogs we catch
+p = 0.04 # true fraction of light frogs
+dbinom(x=7, size=n, prob=p)
+```
+
+**Exercise:** Use the above functions to calculate the probability of seeing at least 7 persons with the disease.
+
+```{r}
+pbinom(q=6, size=100, prob=.04, lower.tail=FALSE)
+```
+
+## The Poisson distribution
+
+Here's a short interlude on random numbers in R, which you can use to simulate your own data. This can be very useful to set up toy models and see what the data or certain plots would look like in theory.
+
+For example, we could simulate frog counts from 100 binomial experiments, that is the counts of light colored frogs from filling a net one hundred times:
+
+```{r}
+set.seed(85)
+size = 10 # number of frogs per net
+prob = 0.3 # true percentage of light colored frogs
+n = 100 # number of binomial experiments
+binomial_frog_counts <- rbinom(n=n, size=size, prob=prob)
+head(binomial_frog_counts)
+```
+
+Here, we used `set.seed()` for reproducibility: The seed gives an initialization to the process of drawing random numbers. So any time we run the same simulation with the same seed, we will get the same random numbers. If we don't set the seed, the random numbers will look different each time we run the code.
+
+**Exercise:** Try the same with Poisson random numbers: Simulate 100 random frog counts with a Poisson rate of 4.
+
+```{r}
+set.seed(81)
+size = 10 # number of frogs per net
+prob = 0.4 # true percentage of light colored frogs
+n = 100 # number of binomial experiments
+binomial_frog_counts <- rbinom(n=n, size=size, prob=prob)
+head(binomial_frog_counts)
+```
+
+**Exercise:** Now run the same simulation again and calculate the mean frog count:
+
+```{r}
+rpois(n = 200, lambda = 4) %>% 
+  mean()
+```
+
+## The Gamma Poisson distribution in R
+
+The Gamma Poisson distribution goes by two names: "Gamma Poisson" or "negative binomial". In R, its suffix is `nbinom.` To make things more confusing, the Gamma Poisson can be parametrized in different ways. This means, it is possible to describe the same distribution with different combinations of parameters.
+
+In the (video lecture)[<https://shiny-portal.embl.de/shinyapps/app/03_csda_tutorial_2>], I introduced a parametrization with
+
+* mean μ (the average Poisson rate) and
+* scale θ (a measure for how much the Poisson rate varies between individual counts),
+
+because I find it most intuitive. The argument `mu` in `dnbinom` lets you define μ. The argument `size` is the inverse of θ, that is for a small size you will get a distribution with a large overdispersion (=spread). For very large values of `size`, the distribution will tend towards a Poisson distribution.
+
+Note: Consult the "Details" in the help function (`help(dnbinom)`) if you choose to parametrize in a different way.
+
+**Exercise:** To demonstrate how the Gamma Poisson distribution differs from a Poisson, let's compare the means and variances.
+
+**Poisson mean:** Simulate 100 random frog counts with a Poisson rate of 4 then calculate the mean:
+
+```{r}
+rpois(n=100, lambda = 4) %>% 
+  mean()
+```
+
+**Poisson variance:** Simulate 100 random frog counts with a Poisson rate of 4, then calculate the variance using the function **var**:
+
+```{r}
+rpois(n=100, lambda = 4) %>% 
+  var()
+```
+
+**Gamma Poisson mean:** Simulate 100 random frog counts from different lakes with a mean 4 and size=2, then calculate the mean:
+
+```{r}
+rnbinom(n=100, mu=4, size=2) %>% 
+  mean()
+```
+
+**Gamma Poisson variance:** Simulate 100 random frog counts from different lakes with a mean of 4 and size=2, then calculate the variance using the function var:
+
+```{r}
+rnbinom(n=100, mu=4, size=2) %>% 
+  var()
+```
+
+## The Gaussian distribution
+
+We covered the Gaussian – also known as Normal distribution earlier in this tutorial as an example, and you have most likely come across it before.
+
+It is applicable to repeated measurements of the same thing, for example
+
+* frog lengths,
+* temperatures or
+* pixel intensities.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
