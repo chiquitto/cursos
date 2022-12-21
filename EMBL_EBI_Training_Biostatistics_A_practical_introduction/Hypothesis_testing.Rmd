@@ -1,0 +1,111 @@
+---
+title: "Hypothesis testing"
+output: html_notebook
+date: '2022-10-12'
+---
+
+By the end of this third interactive tutorial you will be able to:
+
+* explain the common principles behind statistical tests
+* know how to spot common pitfalls
+* perform simple tests in R
+
+Before starting this tutorial, we recommend:
+
+* you complete the first tutorial on (data handling and visualization)[https://www.ebi.ac.uk/training/online/courses/biostatistics-introduction/data-handling-and-visualisation/] or have basic knowledge or R and the tidyverse
+* you complete the second tutorial on (probability distribution)[https://www.ebi.ac.uk/training/online/courses/biostatistics-introduction/probability-distributions/] or have basic knowledge of statistical distributions
+
+## Overview and motivation
+
+Prerequisites:
+* Basic knowledge in R and tidyverse
+* Basic knowledge on statistical distributions
+
+Learning objectives:
+
+* understand the common principles behind statistical tests
+* learn to spot common pitfalls
+* perform simple tests in R
+
+Author: Sarah Kaspar, PhD
+
+Contact: <sarah.kaspar@embl.de>
+
+License: CC BY-NC-SA
+
+Sources
+
+* This tutorial is based on a lecture on testing by Bernd Klaus and Wolfgang Huber (2018).
+* The demonstration in R roughly follows an example shown (here)[https://rafalab.github.io/pages/harvardx.html].
+* The tutorial uses data from Winzell, M. S., & Ahrén, B. (2004).
+* See the References section for more details.
+
+### Steps of hypothesis testing
+
+Let’s recapitulate what happens during hypothesis testing. Ideally, you undertake the following steps:
+
+1. Set up a null model or null hypothesis
+1. Collect data
+1. Calculate the probability of the data in the null model
+1. Decide: Reject the null model if the above probability is too small.
+
+## Our first test: Disease prevalence
+
+Here is what we have just seen:
+
+* In a test group of persons with a precondition, 9 out of 100 have the disease of interest.
+* We compare to a known prevalence of 4%, that means 4% of the entire population have the disease, when not distinguishing between persons with and without the precondition.
+* We want to know whether the observed 9 out of 100 are significantly different from 4%. The null hypothesis thus is that they are not.
+* The alternative hypothesis is that the prevalence in the test group differs from 4%.
+* As we have 100 cases and a bimodal outcome (disease or no disease), a suitable null model is a binomial distribution with n=100 and success probability p=0.04.
+
+### Binomial test in R
+
+R is very convenient for calculating probabilities under different distributions, and also has functions for the common statistical tests.
+
+As a reminder, functions in R that calculate numbers for the binomial distribution all end with binom, and the prefix specifies what to calculate:
+* dbinom: density
+* pbinom: cumulative distribution function (percentage of values smaller than)
+
+For example, you can calculate the probability of observing 5 persons out of 100 with a disease, given a prevalence of 4%:
+
+```{r}
+n = 100 # number of test persons
+p = 0.04 # given prevalence
+dbinom(x=5, size=n, prob=p)
+```
+
+**Exercise:**
+
+Can you perform the test that I showed you in the video, using pbinom?
+For this, you need to calculate the probability of observing 9 or more persons with a disease out of 100, given a ''null prevalence'' of 4%.
+
+```{r}
+# we use q=8, because if lower.tail=FALSE, the probability P(X>x) is calculated.
+# Check help(pbinom) for this.
+pbinom(q=8, size=100, prob=0.04, lower.tail=FALSE)
+```
+
+Look up `binom.test`. This function performs a binomial test – which is what you have just done manually by calculating a binomial probability under a null hypothesis. Use this function to perform the test. Do you get the same result as with pbinom?
+
+```{r}
+binom.test(9,100,p=0.04)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
